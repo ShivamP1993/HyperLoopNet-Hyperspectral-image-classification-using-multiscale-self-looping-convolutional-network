@@ -20,7 +20,7 @@ Steps:
 2. Run data_prepare.py
 ```
 ```
-3. Run model.py
+3. Run hyperloopnet.py
 ```
 
 If using the concept or code, kindly cite the paper as: 
