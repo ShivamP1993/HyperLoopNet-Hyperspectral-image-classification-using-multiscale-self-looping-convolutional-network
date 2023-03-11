@@ -80,37 +80,11 @@ test_patches = np.load('/data/test_patches.npy')
 train_labels = np.load('/data/train_labels.npy')
 test_labels = np.load('/data/test_labels.npy')
 
-
-tr90 = np.empty([2832,11,11,145], dtype = 'float32')
-tr180 = np.empty([2832,11,11,145], dtype = 'float32')
-tr270 = np.empty([2832,11,11,145], dtype = 'float32')
-
-for i in tqdm.tqdm(range(2832)):
-  tr90[i,:,:,:] = np.rot90(train_patches[i,:,:,:])
-  tr180[i,:,:,:] = np.rot90(tr90[i,:,:,:])
-  tr270[i,:,:,:] = np.rot90(tr180[i,:,:,:])
-
-train_patches = np.concatenate([train_patches, tr180], axis = 0)
-train_labels = np.concatenate([train_labels,train_labels], axis = 0)
-
 from sklearn.utils import shuffle
 train_patches, train_labels = shuffle(train_patches, train_labels, random_state=0)
 
 print(np.shape(train_patches))
 print(np.shape(test_patches))
-
-train_vec = np.reshape(train_patches[:,5,5,0:144],[-1,1,144,1])
-test_vec = np.reshape(test_patches[:,5,5,0:144],[-1,1,144,1])
-
-lid_train = train_patches[:,:,:,144:145]
-lid_test = test_patches[:,:,:,144:145]
-
-def cross_atac(x,h,l):
-  
-  a = Multiply()([x,h])
-  b = Multiply()([x,l])
-  ad1 = Concatenate(axis = 3)([a,b,x])
-  return ad1
   
 def my_conv(x,l):
 
@@ -188,37 +162,35 @@ model.summary()
 
 keras.utils.plot_model(model)
 
-for p in range(5):
+x = Input(shape=(11,11,144), name='inputA')
 
-  x = Input(shape=(11,11,144), name='inputA')
+outfinal = ext(x)
 
-  outfinal = ext(x)
+optim = keras.optimizers.Nadam(0.0002) 
 
-  optim = keras.optimizers.Nadam(0.0002) 
+model = Model(x, outfinal, name = 'model')
 
-  model = Model(x, outfinal, name = 'model')
+# Compiling the model
+model.compile(loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'])
+ep = 0
+k=0
+import gc
+for epoch in range(500): 
+gc.collect()
+model.fit(x = train_patches,
+	    y = my_ohc(np.expand_dims(train_labels, axis = 1)),
+	    epochs=1, batch_size = 64, verbose = 1)
 
-  # Compiling the model
-  model.compile(loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'])
-  ep = 0
-  k=0
-  import gc
-  for epoch in range(500): 
-    gc.collect()
-    model.fit(x = train_patches[:,:,:,0:144],
-                    y = my_ohc(np.expand_dims(train_labels, axis = 1)),
-                    epochs=1, batch_size = 64, verbose = 1)
-    
-    preds2 = model.predict(test_patches[:,:,:,0:144], batch_size = 64, verbose = 2) 
+preds2 = model.predict(test_patches, batch_size = 64, verbose = 2) 
 
-    conf = confusion_matrix(test_labels, np.argmax(preds2,1))
-    ovr_acc, _, _, _, _ = accuracies(conf)
+conf = confusion_matrix(test_labels, np.argmax(preds2,1))
+ovr_acc, _, _, _, _ = accuracies(conf)
 
-    print(epoch)
-    print(np.round(100*ovr_acc,2))
-    if ovr_acc>=k:
-      model.save('models/HyperLoopNet')
-      k = ovr_acc
-      ep = epoch
-      np.save('models/ep',epoch)
-    print('acc_max = ', np.round(100*k,2), '% at epoch', ep)
+print(epoch)
+print(np.round(100*ovr_acc,2))
+if ovr_acc>=k:
+model.save('models/HyperLoopNet')
+k = ovr_acc
+ep = epoch
+np.save('models/ep',epoch)
+print('acc_max = ', np.round(100*k,2), '% at epoch', ep)
