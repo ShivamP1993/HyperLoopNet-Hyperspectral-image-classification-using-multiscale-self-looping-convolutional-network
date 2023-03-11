@@ -4,7 +4,7 @@ Hyperspectral image (HSI) classification using convolutional neural networks (CN
 
 ![alt text](images/img_hlnet.png)
 
-URL to the paper: https://www.sciencedirect.com/science/article/pii/S0924271621003191
+>URL to the paper: https://www.sciencedirect.com/science/article/pii/S0924271621003191
 
 If using the concept or code, kindly cite the paper as: S. Pande, B. Banerjee. HyperLoopNet: Hyperspectral image classification using multiscale self-looping convolutional networks. In The ISPRS Journal of Photogrammetry and Remote Sensing, January, 2022.
 
