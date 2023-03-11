@@ -7,7 +7,7 @@ URL to the paper: https://www.sciencedirect.com/science/article/pii/S09242716210
 If using the concept or code, kindly cite the paper as: S. Pande, B. Banerjee. HyperLoopNet: Hyperspectral image classification using multiscale self-looping convolutional networks. In The ISPRS Journal of Photogrammetry and Remote Sensing, January, 2022.
 
 You can also use the bibtex as:
-
+```
 @article{pande2022hyperloopnet,
   title={Hyper{L}oop{N}et: Hyperspectral image classification using multiscale self-looping convolutional networks},
   author={Pande, Shivam and Banerjee, Biplab},
@@ -17,3 +17,4 @@ You can also use the bibtex as:
   year={2022},
   publisher={Elsevier}
 }
+```
